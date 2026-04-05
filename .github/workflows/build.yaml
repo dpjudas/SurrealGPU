@@ -9,8 +9,8 @@ env:
 
 jobs:
   linux:
-    runs-on: ubuntu-20.04
-    name: 🐧 Ubuntu 20.04
+    runs-on: ubuntu-latest
+    name: 🐧 Ubuntu latest
     steps:
       - name: 🧰 Checkout
         uses: actions/checkout@v2
