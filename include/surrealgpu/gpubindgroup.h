@@ -37,6 +37,7 @@ class GPUBindGroupBinding
 {
 public:
 	int bindingIndex = 0;
+	int arrayIndex = 0;
 	struct
 	{
 		GPUBufferBinding buffer;
@@ -78,7 +79,8 @@ enum class GPUBindGroupLayoutBindingType
 	externalTexture,
 	sampler,
 	storageTexture,
-	texture
+	texture,
+	combinedTextureSampler,
 };
 
 enum class GPUSamplerType
@@ -118,6 +120,7 @@ class GPUBindGroupLayoutBinding
 {
 public:
 	int bindingIndex = 0;
+	int arrayCount = 1;
 	GPUShaderStageFlags visibility = GPUShaderStage::fragment;
 	GPUBindGroupLayoutBindingType type = {};
 	struct
