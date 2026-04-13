@@ -5,8 +5,29 @@
 
 GPUSampler::GPUSampler(GPUDevice* device, const GPUSamplerDesc& desc) : device(device), desc(desc)
 {
-	SamplerBuilder builder;
-	sampler = builder.Create(device->getVulkanDevice());
+	VkSamplerCreateInfo samplerInfo = { VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO };
+	samplerInfo.magFilter = (VkFilter)desc.magFilter;
+	samplerInfo.minFilter = (VkFilter)desc.minFilter;
+	samplerInfo.addressModeU = (VkSamplerAddressMode)desc.addressModeU;
+	samplerInfo.addressModeV = (VkSamplerAddressMode)desc.addressModeV;
+	samplerInfo.addressModeW = (VkSamplerAddressMode)desc.addressModeW;
+	samplerInfo.anisotropyEnable = (VkBool32)desc.anisotropyEnable;
+	samplerInfo.maxAnisotropy = desc.maxAnisotropy;
+	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	samplerInfo.unnormalizedCoordinates = VK_FALSE;
+	samplerInfo.compareEnable = VK_FALSE;
+	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+	samplerInfo.mipmapMode = (VkSamplerMipmapMode)desc.mipmapMode;
+	samplerInfo.mipLodBias = desc.mipLodBias;
+	samplerInfo.minLod = desc.minLod;
+	samplerInfo.maxLod = desc.maxLod;
+
+	VkSampler vksampler;
+	VkResult result = vkCreateSampler(device->getVulkanDevice()->device, &samplerInfo, nullptr, &vksampler);
+	device->getVulkanDevice()->CheckVulkanError(result, "Could not create texture sampler");
+	sampler = std::make_unique<VulkanSampler>(device->getVulkanDevice(), vksampler);
+	if (!desc.label.empty())
+		sampler->SetDebugName(desc.label.c_str());
 }
 
 /////////////////////////////////////////////////////////////////////////////
