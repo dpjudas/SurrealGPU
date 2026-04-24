@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "gpuformat.h"
 #include "vulkanobjects.h"
 
 class GPUDevice;
@@ -151,18 +152,80 @@ public:
 	float depthBiasSlopeFactor = 0.0f;
 };
 
+class GPUVertexBufferBinding
+{
+public:
+	uint32_t bindIndex = 0;
+	uint32_t stride = 0;
+};
+
+class GPUVertexAttribute
+{
+public:
+	uint32_t location = 0;
+	uint32_t binding = 0;
+	GPUFormat format = {};
+	uint32_t offset = 0;
+};
+
 class GPUVertexDesc
 {
 public:
-	// to do: vertex input attributes
+	std::vector<GPUVertexBufferBinding> buffers;
+	std::vector<GPUVertexAttribute> attributes;
 	// to do: constants
 	std::vector<uint32_t> shader;
+};
+
+enum class GPUBlendFactor
+{
+	zero,
+	one,
+	srcColor,
+	oneMinusSrcColor,
+	dstColor,
+	oneMinusDstColor,
+	srcAlpha,
+	oneMinusSrcAlpha,
+	dstAlpha,
+	oneMinusDstAlpha,
+	constantColor,
+	oneMinusConstantColor,
+	constantAlpha,
+	oneMinusConstantAlpha,
+	srcAlphaSaturate,
+	src1Color,
+	oneMinusSrc1Color,
+	src1Alpha,
+	oneMinusSrc1Alpha,
+};
+
+enum class GPUBlendOp
+{
+	add,
+	subtract,
+	reverseSubtract,
+	min,
+	max,
 };
 
 class GPUFragmentTarget
 {
 public:
-	// to do: ColorBlendAttachmentBuilder
+	struct
+	{
+		bool red = true;
+		bool green = true;
+		bool blue = true;
+		bool alpha = true;
+	} colorWriteMask;
+	bool blendEnable = false;
+	GPUBlendFactor srcColorBlendFactor = GPUBlendFactor::one;
+	GPUBlendFactor dstColorBlendFactor = GPUBlendFactor::zero;
+	GPUBlendOp colorBlendOp = GPUBlendOp::add;
+	GPUBlendFactor srcAlphaBlendFactor = GPUBlendFactor::one;
+	GPUBlendFactor dstAlphaBlendFactor = GPUBlendFactor::zero;
+	GPUBlendOp alphaBlendOp = GPUBlendOp::add;
 };
 
 class GPUFragmentDesc

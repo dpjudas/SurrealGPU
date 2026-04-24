@@ -213,7 +213,26 @@ GPURenderPipeline::GPURenderPipeline(GPUDevice* device, const GPURenderPipelineD
 
 	for (const GPUFragmentTarget& target : desc.fragment.targets)
 	{
-		//colorBlendAttachments.push_back(state);
+		VkColorComponentFlags mask = 0;
+		if (target.colorWriteMask.red)
+			mask |= VK_COLOR_COMPONENT_R_BIT;
+		if (target.colorWriteMask.green)
+			mask |= VK_COLOR_COMPONENT_G_BIT;
+		if (target.colorWriteMask.blue)
+			mask |= VK_COLOR_COMPONENT_B_BIT;
+		if (target.colorWriteMask.alpha)
+			mask |= VK_COLOR_COMPONENT_A_BIT;
+
+		VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
+		colorBlendAttachment.colorWriteMask = mask;
+		colorBlendAttachment.blendEnable = (VkBool32)target.blendEnable;
+		colorBlendAttachment.srcColorBlendFactor = (VkBlendFactor)target.srcColorBlendFactor;
+		colorBlendAttachment.dstColorBlendFactor = (VkBlendFactor)target.dstColorBlendFactor;
+		colorBlendAttachment.colorBlendOp = (VkBlendOp)target.colorBlendOp;
+		colorBlendAttachment.srcAlphaBlendFactor = (VkBlendFactor)target.srcAlphaBlendFactor;
+		colorBlendAttachment.dstAlphaBlendFactor = (VkBlendFactor)target.dstAlphaBlendFactor;
+		colorBlendAttachment.alphaBlendOp = (VkBlendOp)target.alphaBlendOp;
+		colorBlendAttachments.push_back(colorBlendAttachment);
 	}
 
 	if (!desc.vertex.shader.empty())
@@ -261,26 +280,28 @@ GPURenderPipeline::GPURenderPipeline(GPUDevice* device, const GPURenderPipelineD
 		s->info.pMapEntries = s->entries.data();
 		s->info.pData = s->data.data();
 	}
+	*/
 
-	// AddVertexBufferBinding(int index, size_t stride)
+	for (const GPUVertexBufferBinding& binding : desc.vertex.buffers)
 	{
 		VkVertexInputBindingDescription desc = {};
-		desc.binding = index;
-		desc.stride = (uint32_t)stride;
+		desc.binding = binding.bindIndex;
+		desc.stride = binding.stride;
 		desc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		vertexInputBindings.push_back(desc);
 	}
 
-	// AddVertexAttribute(int location, int binding, VkFormat format, size_t offset)
+	for (const GPUVertexAttribute& attr : desc.vertex.attributes)
 	{
 		VkVertexInputAttributeDescription desc = { };
-		desc.location = location;
-		desc.binding = binding;
-		desc.format = format;
-		desc.offset = (uint32_t)offset;
+		desc.location = attr.location;
+		desc.binding = attr.binding;
+		desc.format = (VkFormat)attr.format;
+		desc.offset = attr.offset;
 		vertexInputAttributes.push_back(desc);
 	}
 
+	/*
 	// AddDynamicState(VkDynamicState state)
 	{
 		dynamicStates.push_back(state);
